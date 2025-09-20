@@ -1,0 +1,26 @@
+@use "@/shared/styles/_vars" as v;
+@use "sass:map";
+
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin spacing-y-($value) {
+  display: flex;
+  flex-direction: column;
+  gap: $value * 1rem;
+}
+
+@mixin container-query($size) {
+  $width: map.get(v.$container-breakpoints, $size);
+
+  @if $width {
+    @container (width >= #{$width}) {
+      @content;
+    }
+  } @else {
+    @warn "No container breakpoint `#{$size}` found!";
+  }
+}
