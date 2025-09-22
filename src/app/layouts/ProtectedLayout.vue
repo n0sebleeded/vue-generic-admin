@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted } from "vue";
+import { onMounted, watch } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@/features/auth/model/store.ts";
 import { useRefreshMutation } from "@/features/auth/api";
@@ -9,15 +9,26 @@ const auth = useAuthStore();
 
 const refreshMutation = useRefreshMutation();
 
-onMounted(() => {
+onMounted(async () => {
   if (auth.isAuthenticated === null) {
-    refreshMutation.mutateAsync();
-  }
-
-  if (!auth.isAuthenticated && auth.isAuthenticated !== null) {
-    router.replace({ path: "auth" });
+    try {
+      await refreshMutation.mutateAsync();
+    } catch (error) {
+      router.replace({ path: "/auth" });
+    }
+  } else if (!auth.isAuthenticated) {
+    router.replace({ path: "/auth" });
   }
 });
+
+watch(
+  () => auth.isAuthenticated,
+  () => {
+    if (auth.isAuthenticated === false) {
+      router.replace({ path: "/auth" });
+    }
+  }
+);
 </script>
 
 <template>
